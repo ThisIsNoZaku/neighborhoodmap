@@ -1,0 +1,32 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <script type='text/javascript' src='../bower_components/knockout/dist/knockout.debug.js'></script>
+    <script type="text/javascript"
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC39F98J8I20xdZDOKeVTO-R5jP8nNXQic&libraries=places,drawing">
+    </script>
+    <script
+            src="https://code.jquery.com/jquery-3.1.1.slim.min.js"
+            integrity="sha256-/SIrNqv8h6QGKDuNoLGA4iret+kyesCkHGzVUUV0shc="
+            crossorigin="anonymous"></script>
+</head>
+<body style="height:100%;margin:0;padding:0">
+<!--
+<div style="height:100%;width:100%;">
+    <div id="map" style="height:100%;width:80%;float:left"></div>
+    <div class="container" id="infobar" style="height:100%;width:20%;float:right">
+        <div class="row">
+            Search For Interesting Locations
+        </div>
+        <div class="row">
+        </div>
+    </div>
+
+</div>
+-->
+<input type="text" data-bind="value:aValue"/>
+<span data-bind="text:aValue"></span>
+<script src="../static/js/map.js"></script>
+</body>
+</html>
