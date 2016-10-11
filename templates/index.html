@@ -1,32 +1,79 @@
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <script type='text/javascript' src='../bower_components/knockout/dist/knockout.debug.js'></script>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <script type='text/javascript' src='static/js/knockout.js'></script>
     <script type="text/javascript"
             src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC39F98J8I20xdZDOKeVTO-R5jP8nNXQic&libraries=places,drawing">
     </script>
     <script
-            src="https://code.jquery.com/jquery-3.1.1.slim.min.js"
-            integrity="sha256-/SIrNqv8h6QGKDuNoLGA4iret+kyesCkHGzVUUV0shc="
+            src="https://code.jquery.com/jquery-3.1.1.min.js"
+            integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
             crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="static/css/map.css" type="text/css"/>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+            crossorigin="anonymous"></script>
+    <!-- http://www.w3schools.com/icons/tryit.asp?filename=tryicons_fa-spinner -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
 </head>
-<body style="height:100%;margin:0;padding:0">
-<!--
-<div style="height:100%;width:100%;">
-    <div id="map" style="height:100%;width:80%;float:left"></div>
-    <div class="container" id="infobar" style="height:100%;width:20%;float:right">
+<body>
+<div id="map"></div>
+<div class="container" id="side-bar">
+    <div class="col-xs-12">
         <div class="row">
             Search For Interesting Locations
         </div>
+        <div class="row center-text">
+            <div class="dropdown">
+                <button class="btn btn-info dropdown-toggle" type="button" data-toggle="dropdown" id="category-dropdown"
+                        aria-haspopup="true" aria-expanded="false"
+                        data-bind="text : selectedCategory() ? selectedCategory() : 'Categories'">
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="category-dropdown">
+                    <li data-bind="foreach : categories() ? Object.keys(categories()) : []">
+                        <a href="#" data-bind="click : selectCategory"><span data-bind="text : $data"></span></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
         <div class="row">
         </div>
+        <div class="row" data-bind="visible : !displayedLocations()">
+            <span class="fa fa-spinner fa-spin" style="font-size:24px"></span>
+        </div>
+        <div class="row" id="search-bar"
+             data-bind="css : {expanded : !selectedLocation(), collapsed : selectedLocation()}">
+            <ul class="list-group" data-bind="foreach : displayedLocations">
+                <li class="list-group-item">
+                    <button class="btn btn-link" data-bind="text : name, click : selectPoi"></button>
+                </li>
+            </ul>
+        </div>
+        <div class="row text-center" id="info-bar"
+             data-bind="css : {expanded : selectedLocation(), collapsed : !selectedLocation()}">
+            <div class="row" data-bind="if : selectedLocation()">
+                <div class="col-xs-12">
+                    <div class="row" data-bind="if : selectedLocation()">
+                        <strong data-bind="text : selectedLocation().name"></strong>
+                    </div>
+                    <div class="row">
+                        <img data-bind="if : selectedLocation().image_url, attr : {src : selectedLocation().image_url}"/>
+                    </div>
+                    <div class="row">
+                        <img data-bind="attr : {src : selectedLocation().rating_img_url_small }"/>
+                    </div>
+                    <div class="row">
+                        Courtesy of Yelp.
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-
 </div>
--->
-<input type="text" data-bind="value:aValue"/>
-<span data-bind="text:aValue"></span>
-<script src="../static/js/map.js"></script>
+<script src="../static/js/map.min.js"></script>
 </body>
 </html>
