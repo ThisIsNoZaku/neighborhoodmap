@@ -6,23 +6,16 @@ from yelp.obj.coordinate import Coordinate
 from yelp.obj.location import Location
 from yelp.oauth1_authenticator import Oauth1Authenticator
 from collections import namedtuple
+import io
+import json
 app = Flask(__name__)
 
 
-yelp_auth = Oauth1Authenticator(
-consumer_key = "v7HXwgfkSVovvEXxadr9xQ",
-consumer_secret = "foYKIb76HGFUFquB3eVouc3qnaA",
-token = "bg7bPvhTJNreJUVww6jEuVZjxziDu7d1",
-token_secret = "hxY74UgdGo5SvZBoD5ain8MMfOQ"
-)
-
-
-client = Client(yelp_auth)
-
-
-@app.route("/data/categories.json")
-def categories():
-	return app.send_static_file("categories.json")
+# Reading credentials from json https://github.com/Yelp/yelp-python
+with io.open('yelp_secret.json') as cred:
+	creds = json.load(cred)
+	yelp_auth = Oauth1Authenticator(**creds)
+	client = Client(yelp_auth)
 
 
 @app.route("/")
@@ -40,9 +33,12 @@ def search():
 	lng = params.pop('longitude')
 	search = client.search_by_coordinates(lat, lng, **params)
 	businesses = []
+	# The objects returned by the Yelp client aren't serializable 
+	# by default
 	for business in search.businesses:
 		b = {
 			'name' : business.name,
+			'id' : business.id,
 			'display_phone' : business.display_phone,
 			'image_url' : business.image_url,
 			'location' : {
