@@ -1,0 +1,24 @@
+{
+	"categories" : {
+		"All" : "amusementparks,galleries,bakeries,bakeries,othersalons,hair,bookstores,cafes,casinos,menscloth,womenscloth,electronics,jewelry,museums,danceclubs,parks,restaurants,shoes,shoppingcenters,spas,zoos",
+		"Amusement Park" : "amusementparks",
+		"Art Gallery" : "galleries",
+		"Bakery" : "bakeries",
+		"Bar" : "bars",
+		"Salon" :"othersalons,hair",
+		"Book Store" : "bookstores",
+		"Cafe" : "cafes",
+		"Casino" : "casinos",
+		"Clothing Store" : "menscloth,womenscloth",
+		"Electronics Store" : "electronics",
+		"Jewelry Store" : "jewelry",
+		"Museum" : "museums",
+		"Night Club" : "danceclubs", 
+		"Park" : "parks", 
+		"Restaurant" : "restaurants", 
+		"Shoe Store" : "shoes", 
+		"Shopping Mall" : "shoppingcenters", 
+		"Spa" : "spas",
+		"Zoo" : "zoos"
+	}
+}
