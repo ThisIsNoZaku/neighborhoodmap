@@ -2,11 +2,32 @@ module.exports = function(grunt){
 	grunt.initConfig({
 		pkg : grunt.file.readJSON("package.json"),
 		uglify: {
-			build : {
-				files : {
-					'static/js/map.min.js' : ['src/map.js'],
-					'static/js/knockout.js' : ['node_modules/knockout/build/output/knockout-latest.js']
+			options : {
+				beautify : true
+			},
+			build: {
+				files : [
+				{
+					expand : true,
+					flatten : false,
+					cwd : "src/",
+					src : "**/*.js",
+					dest : "static/"
 				}
+				]
+			}
+		},
+		cssmin : {
+			build : {
+				files :[
+				{
+					expand : true,
+					flatten : false,
+					cwd : 'src/',
+					src : "**/*.css",
+					dest : "static/",
+					ext : ".min.css"
+				}]
 			}
 		},
 		zip : {
@@ -18,13 +39,30 @@ module.exports = function(grunt){
 				'google api token.txt',
 				'readme.md'
 			]
+		},
+		copy : {
+			build: {
+				files : [
+				{
+					expand : true,
+					flatten : false,
+					src : 'data/*',
+					dest : 'static/',
+					cwd : 'src/'
+				},
+				{
+					"static/js/knockout.js" : "node_modules/knockout/build/output/knockout-latest.debug.js"
+				}]
+			}
 		}
 	})
 	
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-zip');
-	grunt.loadNpmTasks('grunt-install-dependencies');
+	grunt.loadNpmTasks('grunt-contrib-cssmin');
+	grunt.loadNpmTasks('grunt-contrib-copy');
 
-	grunt.registerTask('default', ['install-dependencies','uglify']);
+	grunt.registerTask('default', ['uglify', 'cssmin', 'copy']);
+	grunt.registerTask('package', ['uglify', 'zip']);
 	grunt.registerTask('zip', ['default']);
 };
