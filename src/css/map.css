@@ -1,49 +1,50 @@
-html, body {
+html,
+body {
 	height: 100%;
 	padding: 0;
 	margin: 0;
 }
 
-#side-bar{
-	float:right;
+#side-bar {
 	height:100%;
 	display : flex;
+}
+
+#filter-input {
+	width:85%
 }
 
 #side-bar .img {
 	max-width: 75%;
 }
 
-#info-bar{
-	overflow-y:scroll;
-}
-
-#info-bar.expanded{
+#info-bar.expanded {
 	height:30%;
 	visibility:visible;
 }
 	
-#info-bar.collapsed{
+#info-bar.collapsed {
 	height: 0%;
-	visibility:hidden;
+	visibility: hidden;
 }
 
-#search-bar.expanded{
+#search-bar {
+	height: 100%;
+	overflow-y : scroll;
+}
+
+#search-bar.expanded {
 	height:90%;
 }
 	
-#search-bar.collapsed{
+#search-bar.collapsed {
 	height:60%;
 }
 
-#search-bar{
-	flex : 0 1 auto;
+#info-bar {
+	flex : 1 0 auto;
 	overflow-y:scroll;
-}
-
-#info-bar{
-	flex : 1 0 aut0;
-	overflow-y:scroll;
+	overflow-x:hidden;
 	height:60%;
 }
 
@@ -58,45 +59,45 @@ html, body {
 	white-space: normal;
 }
 
-@media (max-width:600px){
+@media (max-width:600px) {
 	span {
 		font-size: 16px;
 	}
 
-	#map{
+	#map {
 		width: 50%;
 	}
 	
-	#side-bar{
+	#side-bar {
 		width: 50%;
 	}
 	
-	#search-bar{
+	#search-bar {
 		height:95%;
 		overflow-y:scroll;
 	}
 }
 
-@media (min-width:601px) and (max-width:799px){
+@media (min-width:601px) and (max-width:799px) {
 	span {
 		font-size: 18px;
 	}
 
-	#map{
+	#map {
 		width: 65%;
 	}
 	
-	#side-bar{
+	#side-bar {
 		width:35%;
 	}
 }
 
-@media (min-width:800px){
-	#map{
+@media (min-width:800px) {
+	#map {
 		width: 75%;
 	}
 	
-	#side-bar{
+	#side-bar {
 		width:25%;
 	}
 }

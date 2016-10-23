@@ -8,8 +8,8 @@ from yelp.oauth1_authenticator import Oauth1Authenticator
 from collections import namedtuple
 import io
 import json
-app = Flask(__name__)
 
+app = Flask(__name__)
 
 # Reading credentials from json https://github.com/Yelp/yelp-python
 with io.open('yelp_secret.json') as cred:
@@ -60,4 +60,4 @@ def search():
     return jsonify({'businesses': businesses})
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000)

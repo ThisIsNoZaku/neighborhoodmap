@@ -1,21 +1,75 @@
+//Google maps load callback, must be declared at global scope.
+var readyMap;
+
+var blueIconUrl="http://maps.google.com/mapfiles/ms/icons/blue-dot.png";
+var redIconUrl="http://maps.google.com/mapfiles/ms/icons/red-dot.png";
+(function(){
 "use strict";
 var map;
 var drawingManager;
 var markers = [];
-var model = {
-    categories: ko.observable([]),
-    selectedCategory: ko.observable(),
-    displayedLocations: ko.observableArray([]),
-    selectedLocation: ko.observable(),
-    categoryError: null,
-    locationError: null
-};
+function Model(){
+    this.categories= ko.observable();
+    this.selectedCategory= ko.observable();
+	this.locations = ko.observableArray([]);
+	this.filter = ko.observable();
+    this.displayedLocations= ko.computed(function(){
+		this.locations().forEach(function (location) {
+			var existingMarker = markers.find(function(marker){
+				return marker.location == location.id;
+			});
+			if(!existingMarker){
+				var marker = new google.maps.Marker({
+					position: {
+						lat: location.location.coordinate.latitude,
+						lng: location.location.coordinate.longitude
+					},
+					draggable: false,
+					map: map,
+					icon: blueIconUrl,
+					visible : true
+				});
+				markers.push({location: location.id, marker: marker});
+				(function () {
+					marker.addListener("click", function () {
+						model.selectPoi(location);
+					});
+				}());
+			}
+		});
+		markers.forEach(function(marker){
+			marker.marker.setVisible(false);
+		});
+		var self = this;
+		var displayed = this.locations().filter(function(e){
+			return !self.filter() || e.name.toLowerCase().indexOf(self.filter().toLowerCase()) !== -1;
+		});
+		displayed.forEach(function(location){
+			var markerPair = markers.find(function(m){
+				return m.location == location.id;
+			});
+			markerPair.marker.setVisible(true);
+		});
+		return displayed;
+	}, this);
+    this.selectedLocation= ko.observable();
+    this.categoryError= ko.observable();
+    this.locationError= ko.observable();
+	this.selectPoi = function(poi) {
+			model.selectedLocation(poi);
+			centerMap({
+				lat: poi.location.coordinate.latitude,
+				lng: poi.location.coordinate.longitude
+			});
+		};
+}
+var model = new Model();
 
 readyMap = function () {
-    var mapDiv = $("#map").get();
+    var mapDiv = $("#map").get()[0];
     //Code based on tutorials found @ https://developers.google.com/maps/documentation/javascript/libraries
     map = new google.maps.Map(mapDiv, {
-        center: {lat: 33.4936, lng: -117.1484},
+        center: {lat: 40.7142700, lng: -74.0059700},
         zoom: 15,
         clickable: false,
         disableDefaultUi: true,
@@ -35,51 +89,45 @@ readyMap = function () {
     });
     drawingManager.setMap(map);
     $.get("static/data/categories.json").done(function (results) {
-        results = JSON.parse(results);
         model.categories(results.categories);
         //Hard coded, gross!
         model.selectedCategory("All");
     }).fail(function () {
-        model.categoryError = "Unable to load the location categories";
+        model.categoryError("Unable to load the location categories");
     });
+	ko.applyBindings(model);
 };
 
-
-//Clear displayed locations.
-model.displayedLocations.subscribe(function () {
-    $.each(markers, function (i, l) {
-        l.marker.setMap(null);
-    });
-    model.selectedLocation(null);
-}, null, "beforeChange");
+window.maperror = function(msg, url, line, column, error){
+	$("#map").text("Something went wrong when trying to load the script for the map.");
+}
 
 function findPlaces(category) {
-    model.displayedLocations(null);
     //Send the request to the server to use the Python yelp client,
     //keeps secret api tokens out of the browser.
     return $.ajax("yelp", {
         data: {
             latitude: 40.7128,
             longitude: -74.0059,
-            category_filter: category
+            category_filter: category,
+			radius_filter: 10000
         }
     }).done(function (result) {
-        model.displayedLocations(result.businesses);
+        model.locations(result.businesses);
     }).fail(function () {
-        model.locationsError = "Unable to get the locations.";
+        model.locationError("Unable to get the locations.");
     });
 }
 
 function displayCategory(category) {
     if (category) {
-        model.displayedLocations([]);
+        model.locations([]);
         var categories = model.categories()[category];
         findPlaces(categories);
+		if(model.locations().length){
+			model.selectedLocation(model.locations()[0]);
+		}
     }
-}
-
-function selectCategory(item) {
-    model.selectedCategory(item);
 }
 
 function centerMap(position) {
@@ -89,84 +137,31 @@ function centerMap(position) {
     }
 }
 
-function selectPoi(poi) {
-    model.selectedLocation(poi);
-    centerMap({
-        lat: poi.location.coordinate.latitude,
-        lng: poi.location.coordinate.longitude
-    });
-}
-
-ko.applyBindings(model);
 model.selectedCategory.subscribe(displayCategory);
 
-model.displayedLocations.subscribe(function (locations) {
-    markers = [];
-    $.each(locations, function (i, result) {
-        var marker = new google.maps.Marker({
-            position: {
-                lat: result.location.coordinate.latitude,
-                lng: result.location.coordinate.longitude
-            },
-            draggable: false,
-            map: map,
-            icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
-        });
-        markers.push({location: result.id, marker: marker});
-        (function () {
-            marker.addListener("click", function () {
-                selectPoi(result);
-            });
-        }());
-    });
-});
 
-model.selectedLocation.subscribe(function (location) {
-    if (location) {
+model.selectedLocation.subscribe(function (newLocation) {
+    if (newLocation) {
         var markerPair = markers.find(function (m) {
-            return m.location === location.id;
+            return m.location === newLocation.id;
         });
-        var originalMarker = markerPair.marker;
-        (function () {
-            markerPair.marker.addListener("click", function () {
-                selectPoi(
-                    model.displayedLocations().find(function (l) {
-                        return l.id === markerPair.location;
-                    })
-                );
-            });
-        }());
-        markerPair.marker = new google.maps.Marker({
-            position: markerPair.marker.position,
-            draggable: false,
-            map: map
-        });
-        originalMarker.setMap(null);
+        markerPair.marker.setIcon(redIconUrl);
     }
 });
 
-model.selectedLocation.subscribe(function (location) {
-    if (location) {
+model.locations.subscribe(function(){
+	markers.forEach(function(m){
+		m.marker.setMap(null);
+	});
+	markers = [];
+}, null, "beforeChange");
+
+model.selectedLocation.subscribe(function (oldLocation) {
+    if (oldLocation) {
         var markerPair = markers.find(function (m) {
-            return m.location === location.id;
+            return m.location === oldLocation.id;
         });
-        var originalMarker = markerPair.marker;
-        markerPair.marker = new google.maps.Marker({
-            position: markerPair.marker.position,
-            draggable: false,
-            map: map,
-            icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
-        });
-        (function () {
-            markerPair.marker.addListener("click", function () {
-                selectPoi(
-                    model.displayedLocations().find(function (l) {
-                        return l.id === markerPair.location;
-                    })
-                );
-            });
-        }());
-        originalMarker.setMap(null);
+        markerPair.marker.setIcon(blueIconUrl);
     }
 }, null, "beforeChange");
 
@@ -180,3 +175,4 @@ $(window).resize(function () {
         });
     }
 });
+})();

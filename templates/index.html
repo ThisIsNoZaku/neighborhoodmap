@@ -1,20 +1,8 @@
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
-    <meta charset="utf-8"/>
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <script type='text/javascript' src='static/js/knockout.js'></script>
-    <script type="text/javascript" src="static/js/map.js" defer></script>
-    <script
-            src="https://code.jquery.com/jquery-3.1.1.min.js"
-            integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
-            crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="static/css/map.min.css" type="text/css"/>
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
-            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-            crossorigin="anonymous"></script>
     <!-- http://www.w3schools.com/icons/tryit.asp?filename=tryicons_fa-spinner -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
 </head>
@@ -22,38 +10,45 @@
 <div id="map"></div>
 <div class="container" id="side-bar">
     <div class="col-xs-12">
-        <div class="row">
-            Search For Interesting Locations
-        </div>
-        <div class="row center-text" data-bind="if : !categoryError">
-            <div class="dropdown">
-                <button class="btn btn-info dropdown-toggle" type="button" data-toggle="dropdown" id="category-dropdown"
-                        aria-haspopup="true" aria-expanded="false"
-                        data-bind="text : selectedCategory() ? selectedCategory() : 'Categories'">
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="category-dropdown">
-                    <li data-bind="foreach : categories() ? Object.keys(categories()) : []">
-                        <a href="#" data-bind="click : selectCategory" data-bind="text : $data"></a>
-                    </li>
-                </ul>
+        <div id="search-bar" data-bind="css : {expanded : !selectedLocation(), collapsed : selectedLocation()}">
+            <div class="col-xs-12">
+                <div class="row text-center">
+                    Search For Interesting Locations
+                </div>
+                <div class="row center-text" data-bind="if : !categoryError">
+                    <div class="dropdown">
+                        <button class="btn btn-info dropdown-toggle" type="button" data-toggle="dropdown"
+                                id="category-dropdown"
+                                aria-haspopup="true" aria-expanded="false"
+                                data-bind="text : selectedCategory() ? selectedCategory() : 'Categories'">
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="category-dropdown">
+                            <li data-bind="foreach : categories() ? Object.keys(categories()) : []">
+                                <a href="#" data-bind="click : $root.selectedCategory,text : $data"></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="row text-center">
+                    Search Name
+                    <input type="text" data-bind="value : filter, valueUpdate : 'input'" id="filter-input">
+                </div>
+                <div class="row center-text">
+                    <span data-bind="text: categoryError">There was an error when trying to find the categories.</span>
+                </div>
+                <div class="row" data-bind="visible : !displayedLocations()">
+                    <span class="fa fa-spinner fa-spin" style="font-size:24px"></span>
+                </div>
+                <div class="row text-center" id="search-list">
+                    <ul class="list-group" data-bind="foreach : displayedLocations">
+                        <li class="list-group-item">
+                            <button class="btn btn-link" data-bind="click : $root.selectPoi">
+                                <span data-bind="text : name"></span>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
             </div>
-        </div>
-        <div class="row center-text" data-bind="text: categoryError">
-            There was an error when trying to find the categories.
-        </div>
-        <div class="row" data-bind="visible : !displayedLocations()">
-            <span class="fa fa-spinner fa-spin" style="font-size:24px"></span>
-        </div>
-        <!-- styling to center text inside buttons -->
-        <div class="row text-center" id="search-bar"
-             data-bind="css : {expanded : !selectedLocation(), collapsed : selectedLocation()}">
-            <ul class="list-group" data-bind="foreach : displayedLocations">
-                <li class="list-group-item">
-                    <button class="btn btn-link" data-bind="click : selectPoi">
-                        <span data-bind="text : name"></span>
-                    </button>
-                </li>
-            </ul>
         </div>
         <div class="row text-center" id="info-bar"
              data-bind="css : {expanded : selectedLocation(), collapsed : !selectedLocation()}">
@@ -76,10 +71,24 @@
             </div>
         </div>
     </div>
+
 </div>
+</div>
+<script src='static/js/knockout.js'></script>
+<script
+        src="https://code.jquery.com/jquery-3.1.1.min.js"
+        integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+        crossorigin="anonymous"></script>
+<link rel="stylesheet" href="static/css/map.min.css"/>
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"
+      integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+        crossorigin="anonymous"></script>
+<script type="text/javascript" src="static/js/map.js"></script>
 <script type="text/javascript"
-        src="https://maps.googleapis.com/maps/api/js?v=3&key=AIzaSyC39F98J8I20xdZDOKeVTO-R5jP8nNXQic&libraries=places,drawing&callback=readyMap"
-        async defer>
+        src="https://maps.googleapis.com/mapasdfs/api/js?v=3&key=AIzaSyC39F98J8I20xdZDOKeVTO-R5jP8nNXQic&libraries=places,drawing&callback=readyMap"
+        async defer onerror="maperror()">
 </script>
 </body>
 </html>

@@ -1,3 +1,2 @@
-set FLASK_APP=app.py
-flask run
+grunt&set FLASK_APP=app.py&flask run
 pause
